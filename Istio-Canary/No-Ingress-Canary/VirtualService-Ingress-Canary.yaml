@@ -1,0 +1,20 @@
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: vs-no-ingress-echo-canary
+spec:
+  hosts:
+  - echo
+  http:
+  - name: primary        # referenced in canary.trafficRouting.istio.virtualService.routes
+    route:
+    - destination:
+        host: echo # referenced in canary.stableService
+        port:
+          number: 1027
+      weight: 100
+    - destination:
+        host: echo2 # referenced in canary.canaryService
+        port:
+          number: 1027
+      weight: 0

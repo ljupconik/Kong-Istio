@@ -1,0 +1,23 @@
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: vs-ingress-echo-canary
+  # Namespace: deb-ns
+spec:
+  gateways:
+  - my-istion-gateway
+  hosts:
+  - "*"
+  http:
+  - name: primary        # referenced in canary.trafficRouting.istio.virtualService.routes
+    route:
+    - destination:
+        host: echo2 # referenced in canary.stableService
+        port:
+          number: 1027
+      weight: 99
+    - destination:
+        host: echo # referenced in canary.canaryService
+        port:
+          number: 1027
+      weight: 1
