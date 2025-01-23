@@ -10,7 +10,11 @@ spec:
   - kind: Gateway
     name: kong
   rules:
-  - backendRefs:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /echo
+    backendRefs:
     - name: echo
       kind: Service
       port: 1027
