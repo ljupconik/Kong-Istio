@@ -2,11 +2,13 @@ apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: simple-split-http-route
+  namespace: echons
   annotations:
     konghq.com/strip-path: 'true'
 spec:
   parentRefs:
-  - name: kong
+  - kind: Gateway
+    name: kong
   rules:
   - backendRefs:
     - name: echo
@@ -17,3 +19,4 @@ spec:
       kind: Service
       port: 1027
       weight: 50
+# The Gateway, HTTPRoute and Backends must be in the same namespace

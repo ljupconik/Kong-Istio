@@ -1,10 +1,10 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: GatewayClass
 metadata:
-  name: kong
+  name: kong-class
+  # ClusterWide resource
   annotations:
     konghq.com/gatewayclass-unmanaged: 'true'
-
 spec:
   controllerName: konghq.com/kic-gateway-controller
 ---
@@ -12,8 +12,9 @@ apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
   name: kong
+  namespace: echons
 spec:
-  gatewayClassName: kong
+  gatewayClassName: kong-class
   listeners:
   - name: proxy
     port: 80
