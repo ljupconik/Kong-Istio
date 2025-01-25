@@ -1,15 +1,15 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: echo
+  name: echo-tls
   annotations:
     konghq.com/strip-path: 'true'
 spec:
   ingressClassName: kong
-  tls:
-    - hosts:
-      - localhost
-      secretName: my-tls-secret
+  # tls:
+  #   - hosts:
+  #     - localhost
+  #     secretName: my-tls-secret
   rules:
   - http:
       paths:
@@ -20,3 +20,4 @@ spec:
             name: echo
             port:
               number: 1027
+# Works without the Gateway and Gateway Class - its not using them

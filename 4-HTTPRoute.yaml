@@ -6,12 +6,12 @@ metadata:
     konghq.com/strip-path: 'true'
 spec:
   parentRefs:
-  - name: kong
+  - name: kong-gw-echo
   rules:
   - matches:
     - path:
         type: PathPrefix
-        value: /echo
+        value: /echo-httproute
     backendRefs:
     - name: echo
       kind: Service

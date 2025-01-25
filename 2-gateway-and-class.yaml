@@ -1,7 +1,7 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: GatewayClass
 metadata:
-  name: kong
+  name: kong-class
   annotations:
     konghq.com/gatewayclass-unmanaged: 'true'
 
@@ -11,13 +11,25 @@ spec:
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
-  name: kong
+  name: kong-gw-echo
 spec:
-  gatewayClassName: kong
+  gatewayClassName: kong-class
   listeners:
-  - name: proxy
+  - name: proxy-http
     port: 80
     protocol: HTTP
+    allowedRoutes:
+      namespaces:
+         from: All
+  - name: proxy-https
+    protocol: HTTPS
+    port: 443
+    hostname: localhost
+    # tls:
+    #   certificateRefs:
+    #   - kind: Secret
+    #     group: ""
+    #     name: my-tls-secret
     allowedRoutes:
       namespaces:
          from: All

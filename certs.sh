@@ -31,11 +31,11 @@ cat /etc/ssl/certs/ca-certificates.crt # you will find the ca.crt appended in th
 # you dont necessary need a ca.crt here, you could also add the server.crt, which contains the "Authority Key Identifier" of the ca.crt in it, and other info
 
 kubectl create secret tls my-tls-secret \
-  --cert=./server.crt \
-  --key=./server.key
+  --cert=/home/ljupco/certs/server.crt \
+  --key=/home/ljupco/certs/server.key
 
 kubectl create secret generic my-ca-secret \
-  --from-file=ca.crt=./ca.crt
+  --from-file=ca.crt=/home/ljupco/certs/ca.crt
 
 ##################################################################
 ##################################################################
