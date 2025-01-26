@@ -10,7 +10,7 @@
 # k get httproute -n echons
 # k get ingress -n echons
 
-# istioctl install --set profile=minimal -y
+istioctl install --set profile=demo -y
 
 # kubectl create namespace kong
 # kubectl label ns kong istio-injection=enabled
