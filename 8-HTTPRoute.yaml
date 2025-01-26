@@ -9,6 +9,7 @@ metadata:
 spec:
   parentRefs:
   - name: kong-gw-echo
+    kind: Gateway
   rules:
   - matches:
     - path:
@@ -18,8 +19,8 @@ spec:
     - name: echo
       kind: Service
       port: 1027
-      weight: 50
+      weight: 60
     - name: echo2
       kind: Service
       port: 1027
-      weight: 50
+      weight: 40
