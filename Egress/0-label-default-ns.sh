@@ -5,6 +5,7 @@
 
 # curl -sSL http://httpbin.org/headers
 # curl -sSL http://edition.cnn.com/politics
+# kubectl logs -f -l gateway.networking.k8s.io/gateway-name=bin-egress-gateway -c istio-proxy
 
 # 
 # k get all -n echons
@@ -14,8 +15,8 @@
 # k get httproute -n echons
 # k get ingress -n echons
 
-# istioctl install --set profile=demo -y --set meshConfig.outboundTrafficPolicy.mode=REGISTRY_ONLY
-istioctl install --set profile=minimal -y
+istioctl install --set profile=demo -y --set meshConfig.outboundTrafficPolicy.mode=REGISTRY_ONLY
+
 # kubectl create namespace kong
 # kubectl label ns kong istio-injection=enabled
 
@@ -29,12 +30,3 @@ istioctl install --set profile=minimal -y
 #   --key=/home/ljupco/certs/server.key
 
 for f in *.yaml; do kubectl apply -f $f; done
-
-kubectl get all -n echons
-kubectl get secret -n echons
-kubectl get kongplugin -n echons
-kubectl get kongconsumer -n echons
-kubectl get httproute -n echons
-kubectl get ingress -n echons
-kubectl get gatewayclass -n echons
-kubectl get gateway -n echons
