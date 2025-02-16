@@ -8,4 +8,4 @@ plugin: key-auth
 config:
   key_names:
   - apikey
-  # anonymous: alex # WIth this is  works completely anonimous
+  anonymous: lyupcho # WIth this is  works completely anonimous

@@ -1,3 +1,22 @@
+# apiVersion: networking.istio.io/v1beta1
+# kind: ServiceEntry
+# metadata:
+#   name: my-service-entry
+#   namespace: echons
+# spec:
+#   hosts:
+#   - echo2  # Fully qualified domain name (FQDN) of the Service
+#   ports:
+#   - number: 1027
+#     name: http
+#     protocol: HTTP
+#   resolution: STATIC  # Use STATIC resolution for ClusterIP
+#   location: MESH_INTERNAL  # Treat the Service as part of the mesh
+#   endpoints:
+#   - address: 10.98.105.135 # ClusterIP of the Service
+#     ports:
+#       http: 1027
+# ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
@@ -16,11 +35,11 @@ spec:
         type: PathPrefix
         value: /echo-httproute
     backendRefs:
-    - name: echo
-      kind: Service
-      port: 1027
-      weight: 60
+    # - name: echo
+    #   kind: Service
+    #   port: 1027
+    #   weight: 60
     - name: echo2
       kind: Service
       port: 1027
-      weight: 40
+      # weight: 40

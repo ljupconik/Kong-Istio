@@ -1,0 +1,29 @@
+{{- $httprouteNamespace := .Values.metadata.namespace | default "default" -}}
+{{- range $routeName, $route := .Values.httpRoutes -}}
+  {{- range $rule := $route.rules -}}
+    {{- range $backend := $rule.backendRefs -}}
+      {{- if and $backend.namespace (ne $backend.namespace $httprouteNamespace) -}}
+apiVersion: gateway.networking.k8s.io/v1
+kind: ReferenceGrant
+metadata:
+  name: referencegrant-{{ $routeName }}-{{ $backend.namespace }}-{{ $backend.name }}
+  namespace: {{ $backend.namespace }}
+  labels:
+    {{- toYaml $.Values.metadata.labels | nindent 4 }}
+  annotations:
+    {{- toYaml $.Values.metadata.annotations | nindent 4 }}
+spec:
+  from:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      namespace: {{ $httprouteNamespace }}
+  to:
+    - group: ""
+      kind: Service
+      name: {{ $backend.name }}
+      namespace: {{ $backend.namespace }}
+---
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}

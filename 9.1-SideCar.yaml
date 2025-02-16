@@ -1,0 +1,27 @@
+apiVersion: networking.istio.io/v1
+kind: Sidecar
+metadata:
+  name: sidecar-kong
+  namespace: kong
+spec:
+  egress:
+  - hosts:
+    # - "./*"  # Allow traffic within the kong namespace
+    - "*/*"  # Allow traffic to the default namespace
+  outboundTrafficPolicy:
+    mode: REGISTRY_ONLY
+# ---
+# apiVersion: networking.istio.io/v1
+# kind: Sidecar
+# metadata:
+#   name: allow-all-egress
+#   namespace: kong
+# spec:
+#   workloadSelector:
+#     labels:
+#       app.kubernetes.io/name: gateway
+#   egress:
+#   - hosts:
+#     - "*/*"
+#   outboundTrafficPolicy:
+#     mode: ALLOW_ANY

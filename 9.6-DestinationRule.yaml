@@ -1,0 +1,12 @@
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: namespace-wide-dr
+  namespace: echons
+spec:
+  exportTo:
+  - "*"
+  host: "*.echons.svc.cluster.local"
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL

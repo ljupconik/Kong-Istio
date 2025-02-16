@@ -1,0 +1,42 @@
+httpRoutes:
+  "dapi":
+    hostnames:
+      - "example.com"
+    rules:
+      - matches:
+          - path:
+              type: "Prefix"
+              value: "/dapi/charities"
+        backendRefs:
+          - name: "service1-1"
+            port: 80
+            namespace: ns1-1
+            weight: 90
+          - name: "service1-2"
+            port: 80
+            weight: 10
+            namespace: ns1-2
+
+  "http-route-2":
+    hostnames:
+      - "anotherexample.com"
+    rules:
+      - matches:
+          - path:
+              type: "Exact"
+              value: "/v1/health"
+        backendRefs:
+          - name: "health-service"
+            port: 8080
+            weight: 100
+            namespace: "health-ns"
+
+
+# Optional: Define common metadata for all HTTPRoutes
+metadata:
+  namespace: "httproute-ns"
+  labels:
+    app: "my-app"
+    environment: "production"
+  annotations:
+    example.com/some-annotation: "some-value"
