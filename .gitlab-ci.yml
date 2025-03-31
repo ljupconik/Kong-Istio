@@ -62,7 +62,7 @@ deploy_job:
       if [ "$XRAY_TEST_STATUS" = "failed" ]; then
         if [ "$ACCEPT_SECURITY_RISKS_CVE" = "false" ]; then
           echo "❌ Failing job: Security risks detected (XRAY_TEST_STATUS=$XRAY_TEST_STATUS, ACCEPT_SECURITY_RISKS_CVE=$ACCEPT_SECURITY_RISKS_CVE)"
-          echo "Please fix the detected security issues, or run the pipeline manually and input your Jira ticket number as the value of the variable ACCEPT_SECURITY_RISKS_CVE"
+          echo "Please fix the detected security issues, or run the pipeline manually and input your Jira ticket number as the value of the variable 'ACCEPT_SECURITY_RISKS_CVE'"
           exit 1
         else
           echo "⚠️ WARNING: Deploying with failed tests (manually approved)"
