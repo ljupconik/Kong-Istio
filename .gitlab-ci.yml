@@ -1,0 +1,71 @@
+variables:
+  ACCEPT_SECURITY_RISKS_CVE:
+    value: "false"
+    description: "My web variable"
+
+test_job:
+  stage: test
+  image: busybox:musl
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: always
+    - if: $CI_PIPELINE_SOURCE == "web"
+      when: manual
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: always
+    - when: never
+  script:
+    - echo "TEST Stage"
+    - echo "ACCEPT_SECURITY_RISKS_CVE=$ACCEPT_SECURITY_RISKS_CVE"
+    - EXIT=0
+    - >
+      if [ $EXIT -eq 1 ]; then
+        echo "❌ Xray scan tests failed"
+        exit 1
+      else
+        echo "✅ Xray scan tests passed"
+
+      fi
+  artifacts:
+    reports:
+      dotenv: ./env_vars.env
+  allow_failure: true
+  after_script:
+    - echo "CI_JOB_STATUS = $CI_JOB_STATUS"
+    - echo "XRAY_TEST_STATUS=$CI_JOB_STATUS" >> ./env_vars.env
+
+deploy_job:
+  stage: deploy
+  image: busybox:musl
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: never
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: always
+    - if: $CI_PIPELINE_SOURCE == "web"
+      when: manual
+    - when: never
+  needs: ["test_job"]
+  script:
+    - echo "XRAY_TEST_STATUS = $XRAY_TEST_STATUS"
+    - echo "ACCEPT_SECURITY_RISKS_CVE = $ACCEPT_SECURITY_RISKS_CVE"
+    - >
+      if [ "$ACCEPT_SECURITY_RISKS_CVE" != "false" ]; then
+        if [[ ! "$ACCEPT_SECURITY_RISKS_CVE" =~ ^HIP-[0-9]{4}$ ]]; then
+          echo "❌ Error: ACCEPT_SECURITY_RISKS_CVE must be either 'false' or match format 'HIP-1234'"
+          echo "Received: '$ACCEPT_SECURITY_RISKS_CVE'"
+          exit 1
+        fi
+        echo "✅ Valid HIP pattern: $ACCEPT_SECURITY_RISKS_CVE"
+      fi
+    - >
+      if [ "$XRAY_TEST_STATUS" = "failed" ]; then
+        if [ "$ACCEPT_SECURITY_RISKS_CVE" = "false" ]; then
+          echo "❌ Failing job: Security risks detected (XRAY_TEST_STATUS=$XRAY_TEST_STATUS, ACCEPT_SECURITY_RISKS_CVE=$ACCEPT_SECURITY_RISKS_CVE)"
+          echo "Please fix the detected security issues, or run the pipeline manually and input your Jira ticket number as the value of the variable ACCEPT_SECURITY_RISKS_CVE)"
+          exit 1
+        else
+          echo "⚠️ WARNING: Deploying with failed tests (manually approved)"
+        fi
+      fi
+    - echo "✅ DEPLOYING"
