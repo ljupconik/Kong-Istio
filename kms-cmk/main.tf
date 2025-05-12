@@ -27,48 +27,56 @@ data "aws_iam_policy_document" "kms_policy" {
     }
   }
 
-  # Key administration permissions
-  statement {
-    sid = "AllowKeyAdministration"
-    actions = [
-      "kms:Create*",
-      "kms:Describe*",
-      "kms:Enable*",
-      "kms:List*",
-      "kms:Put*",
-      "kms:Update*",
-      "kms:Revoke*",
-      "kms:Disable*",
-      "kms:Get*",
-      "kms:Delete*",
-      "kms:TagResource",
-      "kms:UntagResource",
-      "kms:ScheduleKeyDeletion",
-      "kms:CancelKeyDeletion"
-    ]
-    resources = ["*"]
+  # Key administrators - https://docs.aws.amazon.com/kms/latest/developerguide/key-policy-default.html#key-policy-default-allow-administrators
+  dynamic "statement" {
+    for_each = length(var.additional_key_admins) > 0 ? [1] : []
 
-    principals {
-      type        = "AWS"
-      identifiers = var.additional_key_admins
+    content {
+      sid = "AllowKeyAdministration"
+      actions = [
+        "kms:Create*",
+        "kms:Describe*",
+        "kms:Enable*",
+        "kms:List*",
+        "kms:Put*",
+        "kms:Update*",
+        "kms:Revoke*",
+        "kms:Disable*",
+        "kms:Get*",
+        "kms:Delete*",
+        "kms:TagResource",
+        "kms:UntagResource",
+        "kms:ScheduleKeyDeletion",
+        "kms:CancelKeyDeletion"
+      ]
+      resources = ["*"]
+
+      principals {
+        type        = "AWS"
+        identifiers = var.additional_key_admins
+      }
     }
   }
 
-  # Key usage permissions
-  statement {
-    sid = "AllowKeyUsage"
-    actions = [
-      "kms:Encrypt",
-      "kms:Decrypt",
-      "kms:ReEncrypt*",
-      "kms:GenerateDataKey*",
-      "kms:DescribeKey"
-    ]
-    resources = ["*"]
+  # Key users - https://docs.aws.amazon.com/kms/latest/developerguide/key-policy-default.html#key-policy-default-allow-users
+  dynamic "statement" {
+    for_each = length(var.key_users) > 0 ? [1] : []
 
-    principals {
-      type        = "AWS"
-      identifiers = var.key_users
+    content {
+      sid = "AllowKeyUsage"
+      actions = [
+        "kms:Encrypt",
+        "kms:Decrypt",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:DescribeKey"
+      ]
+      resources = ["*"]
+
+      principals {
+        type        = "AWS"
+        identifiers = var.key_users
+      }
     }
   }
 }
