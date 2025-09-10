@@ -62,10 +62,47 @@ deploy_job:
       if [ "$XRAY_TEST_STATUS" = "failed" ]; then
         if [ "$ACCEPT_SECURITY_RISKS_CVE" = "false" ]; then
           echo "❌ Failing job: Security risks detected (XRAY_TEST_STATUS=$XRAY_TEST_STATUS, ACCEPT_SECURITY_RISKS_CVE=$ACCEPT_SECURITY_RISKS_CVE)"
-          echo "Please fix the detected security issues, or run the pipeline manually and input your Jira ticket number as the value of the variable 'ACCEPT_SECURITY_RISKS_CVE'"
+          echo "Please fix the detected security issues, or run the pipeline manually and input your Jira ticket number as the value of the variable ACCEPT_SECURITY_RISKS_CVE)"
           exit 1
         else
           echo "⚠️ WARNING: Deploying with failed tests (manually approved)"
         fi
       fi
     - echo "✅ DEPLOYING"
+
+
+auto_approve_sandbox:
+  stage: .pre
+  image: alpine/curl
+  script:
+    - |
+      # Get changed files
+      CHANGED_FILES=$(git diff --name-only $CI_MERGE_REQUEST_TARGET_BRANCH_NAME...HEAD)
+      echo "Changed files: $CHANGED_FILES"
+      
+      # Check if ALL files are sandbox-only
+      SANDBOX_ONLY=true
+      for file in $CHANGED_FILES; do
+        if [[ ! $file =~ ^[^/]+/_environments/sandbox- ]]; then
+          SANDBOX_ONLY=false
+          echo "Non-sandbox file found: $file"
+          break
+        fi
+      done
+      
+      if [ "$SANDBOX_ONLY" = true ]; then
+        echo "All changes are sandbox-only. Auto-approving..."
+        
+        # Auto-approve via GitLab API
+        curl --request POST \
+          --header "PRIVATE-TOKEN: $GITLAB_API_TOKEN" \
+          --header "Content-Type: application/json" \
+          "https://gitlab.example.com/api/v4/projects/$CI_PROJECT_ID/merge_requests/$CI_MERGE_REQUEST_IID/approve"
+          
+        echo "✅ Sandbox-only MR auto-approved"
+      else
+        echo "⏳ Mixed changes detected. Manual approval required."
+      fi
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  allow_failure: true
